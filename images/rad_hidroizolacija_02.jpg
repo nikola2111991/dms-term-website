@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <title>Daibau.rs - portal zanatlija, traženje zanatlija, skupljanje ponuda za posao, izrada veb stranice, zanatlijski portal</title>
+        <link rel="icon" sizes="16x16" href="https://www.daibau.rs/favicon-16-32.svg" type="image/svg+xml" />
+    <link rel="icon" sizes="32x32" href="https://www.daibau.rs/favicon-16-32.svg" type="image/svg+xml" />
+    <link rel="icon" sizes="48x48" href="https://www.daibau.rs/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" sizes="144x144" href="https://www.daibau.rs/favicon.svg" type="image/svg+xml" />
+        <script src="https://www.daibau.rs/jsmodules/jquery.min.js"></script>
+    <script type="text/javascript" src="/jsmodules/cookieconsent/cookieconsent.js"></script>
+<link type="text/css" rel="stylesheet" href="/jsmodules/cookieconsent/cookieconsent.css">
+<script type="text/javascript">
+    window.addEventListener('load', function () {
+
+        // obtain plugin
+        var cc = initCookieConsent();
+        var rconsent = false;
+
+        // run plugin with your configuration
+        cc.run({
+            current_lang: 'en',
+            autoclear_cookies: true,                   // default: false
+            page_scripts: true,                        // default: false
+
+            // mode: 'opt-in'                          // default: 'opt-in'; value: 'opt-in' or 'opt-out'
+            // delay: 0,                               // default: 0
+            // auto_language: '',                      // default: null; could also be 'browser' or 'document'
+            // autorun: true,                          // default: true
+            force_consent: rconsent,                   // default: false
+            // hide_from_bots: false,                  // default: false
+            // remove_cookie_tables: false             // default: false
+            // cookie_name: 'cc_cookie',               // default: 'cc_cookie'
+            cookie_expiration: 365,                 // default: 182 (days)
+            // cookie_necessary_only_expiration: 182   // default: disabled
+            // cookie_domain: location.hostname,       // default: current domain
+            // cookie_path: '/',                       // default: root
+            // cookie_same_site: 'Lax',                // default: 'Lax'
+            // use_rfc_cookie: false,                  // default: false
+            // revision: 0,                            // default: 0
+
+            onFirstAction: function (user_preferences, cookie) {
+                // callback triggered only once on the first accept/reject action
+            },
+
+            onAccept: function (cookie) {
+                // callback triggered on the first accept/reject action, and after each page load
+            },
+
+            onChange: function (cookie, changed_categories) {
+                // callback triggered when user changes preferences after consent has already been given
+                
+                //have to reset gtag consents
+                if (!cc.allowedCategory('targeting')) {
+                    gtag('consent', 'update', {
+                        'ad_user_data': 'denied',
+                        'ad_personalization': 'denied',
+                        'ad_storage': 'denied',
+                        'analytics_storage': 'granted'
+                    });
+                };
+                if (cc.allowedCategory('targeting')) {
+                    gtag('consent', 'update', {
+                        'ad_user_data': 'granted',
+                        'ad_personalization': 'granted',
+                        'ad_storage': 'granted',
+                        'analytics_storage': 'granted'
+                    });
+                };
+            },
+
+            languages: {
+                'en': {
+                    consent_modal: {
+                        title: 'Informacije o kolačićima',
+                        description: 'Kolačići: strana za funkcioniranje koristi kolačiće, koji <b>ne čuvaju lične podatke</b>. Neki kolačići su možda već postavljeni u skladu sa zakonom. Sa nastavkom posete stranice se slažete sa njihovim korišćenjem. <button type="button" data-cc="c-settings" class="cc-link">Podešavanja kolačića</button>',
+                        primary_btn: {
+                            text: 'Prihvati i zatvori',
+                            role: 'accept_all'              // 'accept_selected' or 'accept_all'
+                        }
+                    },
+                    settings_modal: {
+                        title: 'Podešavanja kolačića',
+                        save_settings_btn: 'Sačuvaj',
+                        accept_all_btn: 'Prihvati i zatvori',
+                        close_btn_label: 'Close',
+                        cookie_table_headers: [
+                            {col1: 'Naziv'},
+                            {col2: 'Opis'},
+                            {col3: 'Rok trajanja'},
+                        ],
+                        blocks: [
+                            {
+                                title: 'Korišćenje kolačića',
+                                description: 'Kolačiće koristimo da bismo obezbedili osnovnu funkcionalnost veb-stranice i poboljšali vaše iskustvo. Možete se prijaviti/odjaviti u bilo kom trenutku za svaku kategoriju. Više detalja u vezi sa kolačićima i drugim osetljivim podacima, možete pročitati u <a href="https://www.daibau.rs/politika_privatnosti" class="cc-link">politici privatnosti</a>.'
+                            },
+                            {
+                                title: 'Obavezni kolačići',
+                                description: 'Kolačići su potrebni za pravilno funkcionisanje sistema i prikazivanje stranica koje posećujete.',
+                                toggle: {
+                                    value: 'necessary',
+                                    enabled: true,
+                                    readonly: true          // cookie categories with readonly=true are all treated as "necessary cookies"
+                                },
+                                cookie_table: [             // list of all expected cookies
+                                    {
+                                        col1: 'daibaurs',
+                                        col2: 'Kolačić za autentifikaciju i podatke o sesiji, čuva informacije neophodne za pravilno funkcionisanje sistema i prikaz stranice prilikom posete.',
+                                        col3: '2 meseca',
+                                    },
+                                    {
+                                        col1: 'csrf_cookie',
+                                        col2: 'Sprečava napade falsifikovanja zahteva preko veb-lokacija (CSRF).',
+                                        col3: '5 minuta'
+                                    }
+                                ]
+                            },
+                            {
+                                title: 'Kolačići za procenjivanje učinka',
+                                description: 'Kolačići za procenu učinka, anonimnim prikupljanjem i prenošenjem podataka, pomažu vlasnicima veb-lokacija da razumeju kako posetioci komuniciraju sa veb-lokacijama.',
+                                toggle: {
+                                    value: 'analytics',     // your cookie category
+                                    enabled: true,
+                                    readonly: false
+                                },
+                                cookie_table: [             // list of all expected cookies
+                                    {
+                                        col1: '_ga',       // match all cookies starting with "_ga"
+                                        col2: 'Ovaj nasumično generisani jedinstveni broj se koristi za izračunavanje podataka o poseti našoj veb-stranici.',
+                                        col3: '2 godine'
+                                    },
+                                    {
+                                        col1: 'gat',       // match all cookies starting with "_ga"
+                                        col2: 'Kolačić se koristi za ograničavanje učestalosti pogodaka.',
+                                        col3: '1 minut'
+                                    },
+                                    {
+                                        col1: '_gid',
+                                        col2: 'Koristi se za razlikovanje korisnika.',
+                                        col3: '1 dan'
+                                    },
+                                    {
+                                        col1: 'optiMonkClient',
+                                        col2: 'Koristi se za čuvanje podataka o kampanji: ID kampanje, datum datum i vreme prve posete, datum i vreme poslednje posete, broj poseta, ID varijacije, status kampanje i broj prikaza za posetioca.',
+                                        col3: '1 godina'
+                                    },
+                                    {
+                                        col1: 'optiMonkClientId',
+                                        col2: 'Koristi se za razlikovanje korisnika',
+                                        col3: '1 godina'
+                                    },
+                                    {
+                                        col1: 'optiMonkSession',
+                                        col2: 'Čuva ID trenutne sesije posetioca.',
+                                        col3: 'Trajanje sesije'
+                                    }
+                                ]
+                            },
+                            {
+                                title: 'Kolačići za oglašavanje/ciljno usmereni kolačići',
+                                description: 'Kolačići za oglašavanje/ciljno usmereni kolačići se koriste za praćenje posetilaca na veb-lokacijama. Njihova svrha je da prikažu oglase koji su relevantni i privlače pažnju pojedinačnih korisnika i zato imaju veću vrednost za oglašivače i ponuđače.',
+                                toggle: {
+                                    value: 'targeting',
+                                    enabled: true,
+                                    readonly: false
+                                },
+                                cookie_table: [
+                                    {
+                                        col1: '_fbp',
+                                        col2: 'Facebook Pixel je deo koda uključenog na veb-lokaciju. Ovaj alat nam omogućava da pratimo aktivnosti korisnika na našem sajtu, a samim tim i da im prikazujemo personalizovane reklamne poruke na društvenoj mreži Facebook.',
+                                        col3: '3 meseca'
+                                    },
+                                    {
+                                        col1: 'doubleclick.net',
+                                        col2: "This DoubleClick cookie is generally set through the site by advertising partners, and used by them to build a profile of the website visitor's interests and show relevant ads on other sites. This cookie works by uniquely identifying your browser and device.",
+                                        col3: '13 months'
+                                    },
+                                    {
+                                        col1: 'googleadservives.com',
+                                        col2: 'The Googleadservices.com cookies help website owners who buy ads from Google to determine how many people who click their ads end up purchasing their products. The conversion tracking cookie is set on your browser only when you click an ad delivered by Google where the advertiser has opted in to conversion tracking.',
+                                        col3: '13 months'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        });
+
+        if(!rconsent) {
+            cc.accept(['necessary', 'analytics', 'targeting']);
+            setTimeout(function() { cc.hide(); cc.hideSettings();}, 100);
+        };
+
+    });
+</script>
+    <script>
+function setCookie(name, value, days) {
+    const date = new Date();
+    const expirationTime = date.getTime() + (days * 24 * 60 * 60 * 1000);
+    date.setTime(expirationTime); // Set expiration time
+
+    const expires = `expires=${date.toUTCString()}`;
+    const sameSite = `SameSite=Lax`; // For cross-origin compliance
+    const secure = window.location.protocol === 'https:' ? `Secure` : ''; // Add Secure for HTTPS
+
+    //console.log(`Setting cookie: ${name}, expires on: ${date.toUTCString()}`);
+    document.cookie = `${name}=${encodeURIComponent(value)}; ${expires}; path=/; ${sameSite}; ${secure}`;
+}
+
+// Function to get a cookie by name
+function getCookie(name) {
+    const nameEQ = `${name}=`;
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        if (cookie.indexOf(nameEQ) === 0) {
+            return decodeURIComponent(cookie.substring(nameEQ.length));
+        }
+    }
+    return null;
+}
+
+// Function to get URL parameters
+function getUrlParameter(name) {
+    const regex = new RegExp(`[?&]${name}=([^&#]*)`);
+    const results = regex.exec(window.location.href);
+    return results ? decodeURIComponent(results[1]) : null;
+}
+
+function handleUtmParameters() {
+    const utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gad_source', 'gclid'];
+    const attributionPeriodDays = 30; // Default attribution period (in days)
+
+    // Get current timestamp
+    const now = new Date().getTime();
+
+    // Retrieve existing campaigns from the cookie
+    let campaigns = getCookie('daibau_ct');
+    campaigns = campaigns ? JSON.parse(campaigns) : [];
+
+    // Filter out expired campaigns
+    campaigns = campaigns.filter(campaign => {
+        const timeElapsed = now - campaign.timestamp;
+        return timeElapsed <= attributionPeriodDays * 24 * 60 * 60 * 1000; // Time in milliseconds
+    });
+
+    // Capture new UTM parameters
+    const newCampaign = {};
+    let isNew = false;
+
+    utmParams.forEach(param => {
+        const value = getUrlParameter(param);
+        if (value) {
+            newCampaign[param] = value;
+            isNew = true;
+        }
+    });
+
+    if (isNew) {
+        newCampaign.timestamp = now;
+
+        // Check if the campaign already exists
+        const existingIndex = campaigns.findIndex(campaign =>
+            utmParams.every(param => campaign[param] === newCampaign[param])
+        );
+
+        if (existingIndex !== -1) {
+            // Update the timestamp of the existing campaign
+            campaigns[existingIndex].timestamp = now;
+        } else {
+            // Add the new campaign
+            campaigns.push(newCampaign);
+        }
+    }
+
+    // Update the cookie with the combined campaigns and set expiration
+    setCookie('daibau_ct', JSON.stringify(campaigns), attributionPeriodDays);
+}
+
+/*
+function populateUTMform() {
+    const attributionPeriodDays = 30; // Default attribution period
+    const now = new Date().getTime();
+
+    const utmData = getCookie('daibau_ct');
+    if (utmData) {
+        let campaigns = JSON.parse(utmData);
+
+        // Filter valid campaigns based on attribution period
+        campaigns = campaigns.filter(campaign => {
+            const timeElapsed = now - campaign.timestamp;
+            return timeElapsed <= attributionPeriodDays * 24 * 60 * 60 * 1000; // Time in milliseconds
+        });
+
+        // Update the field with the valid campaigns
+        const hiddenField = document.getElementById('campaigns_utm');
+        if (hiddenField) {
+            hiddenField.value = JSON.stringify(campaigns);
+        }
+    }
+}
+*/
+
+$(document).ready(function() {
+    handleUtmParameters();
+    //populateUTMform();
+});
+</script>    <script>!window.jQuery && document.write('<script src="https://www.daibau.rs/jsframework/jquery-1.7.2.min.js"><\/script>')</script>
+    <script type="text/javascript" src="https://www.daibau.rs/jsmodules/blazy.min.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="preconnect stylesheet" type='text/css'>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0">
+        <link rel="stylesheet" type="text/css" href="https://www.daibau.rs/styles/site.min.css?v=3.85" />
+        <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+    <script>
+        if (typeof Promise !== "function")
+            document.write('<script src="https://www.daibau.rs/jsmodules/es6-promise.min.js"><\/script>');
+    </script>
+    <script>
+    // Define dataLayer and the gtag function.
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    // Set default consent to 'denied' as a placeholder
+    gtag('consent', 'default', {
+      'ad_storage': 'denied',
+      'ad_user_data': 'denied',
+      'ad_personalization': 'denied',
+      'analytics_storage': 'granted'
+    });
+    </script>
+                        <script type="text/plain" data-cookiecategory="analytics" src="https://www.googletagmanager.com/gtag/js?id=G-3MP94Z0DN6"></script>
+            <script data-cookiecategory="analytics">
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-3MP94Z0DN6');
+                gtag('config', 'AW-10996205660');
+            </script>
+            <script type="text/plain" data-cookiecategory="targeting">
+            function allConsentGranted() {
+              gtag('consent', 'update', {
+                'ad_user_data': 'granted',
+                'ad_personalization': 'granted',
+                'ad_storage': 'granted',
+                'analytics_storage': 'granted'
+              });
+            }
+            allConsentGranted();
+            </script>
+            
+            
+    <script type="text/javascript">
+
+        function blazy() {
+            var bLazy = new Blazy({
+                selector: '.lld', // all images
+                success: function(ele) {
+                    // Image has loaded
+                    $('.lld').addClass('lld-loaded');
+                    
+                    var $this = $(ele);
+                    if ($this.width()/$this.height()>=1.49) {
+                        $this.addClass("ihorizontal");
+                    }
+                    else
+                        $this.addClass("ivertical");
+
+                    if ($this.width()/$this.height()<0.8) {
+                        $this.addClass("strw");
+                    }
+                    else
+                        $this.addClass("strh");
+
+                    if ($this.width()/$this.height()<1) {
+                        $this.addClass("rv");
+                    }
+                    else
+                        $this.addClass("rh");
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            //init images
+            blazy();
+        });
+    </script>
+
+    
+    
+    </head>
+<script src="https://unpkg.com/@dotlottie/player-component@2.7.11/dist/dotlottie-player.mjs" type="module"></script> 
+
+
+<body>
+
+<style>
+
+.menu-main { margin-top:0px; }
+.menu-main li, .menu-main ll { font-size:0.95rem;margin-right:12px; }
+.cntr img { margin-right:10px !important;height:20px !important;width:20px !important; }
+.smri a:hover, .smle a:hover, .extendedMenuMainCats a:hover { color:var(--dborange-p) !important; }
+
+@media only screen and (max-width: 1025px) {
+
+	.menu-main li, .menu-main ll { margin-right:0px; }
+	.mwrpw { padding:30px !important;box-shadow:none !important; }
+	.collapse {
+    display: none;
+    position: absolute;
+    top:54px;
+    background-color: white;
+    box-shadow: 20px 50px 50px #333 !important;
+    width: 93%;
+	}
+
+	.menucap img {
+	    height: 22px;
+	    margin-right: 16px;
+	}	
+  .formMenu, .countryMenu, #directoryMenu1, #directoryMenu2, #calculatorMenu1, #calculatorMenu2, .aboutMenu, .countryMenu, .magazineMenu, .collapse, .toolsMenu, .dirsbmn, .calsbmn {
+    display: block;
+    transition: 0.2s ease !important;
+    right: -100%;
+    left:auto !important;
+    margin-left:auto !important;
+  }
+
+  .formMenu.active, .countryMenu.active, #directoryMenu1.active, #directoryMenu2.active, #calculatorMenu1.active, #calculatorMenu2.active, .aboutMenu.active, .countryMenu.active, .magazineMenu.active, .collapse.active, .toolsMenu.active, .dirsbmn.active, .calsbmn.active {
+    display: block;
+    right: 0;
+    width: 93% !important;
+  }
+
+  .smri a, .smle a { flex-basis:100%; }
+  .mmic { height:29px !important;margin-right:26px !important;margin-top:0px !important; }
+  .mndwn { display:none; }
+}
+
+@media only screen and (min-width: 1025px) {
+.sxtnddMenu { right:-270px; }
+.mndwn { height:10px !important;margin-left:6px; }
+.maina { display:flex;align-items:center; }
+.menucap img {
+	    height: 22px;
+	    margin-right: 4px;
+	}	
+.mmic { display: none !important; }
+.countryMenu, #calculatorMenu1, #calculatorMenu2, .aboutMenu, .countryMenu, #directoryMenu1, .collapse {
+    right: 0px;
+  }
+ }
+</style>
+<script>
+  function toggleMenu(target) {
+    var formMenu = $(target);
+    formMenu.toggleClass('active');
+  }
+</script>
+
+<style type="text/css">
+
+
+</style>
+
+<style type="text/css">
+	.smri { width: 68%;padding:30px;border-left: 1px solid #e5e5e5;display: flex;flex-wrap: wrap;max-height: 85vh;overflow-y: scroll;column-gap: 4%; }
+	.smle { width: 50%;padding:16px;border-right: 1px solid #e5e5e5;display: flex;flex-wrap: wrap;max-height: 85vh; }
+	.smri a, .smle a { flex-basis:100%; }
+	.mcti { flex-basis: 100%;font-size:1rem;color:black;display:block;margin-bottom:12px;padding-left:8px;border-left:8px solid #f2520d; }
+</style>
+
+<div id="header">
+<div class="landing-mobile-menu" id="mainmenu" style="max-width:1150px;margin:auto;">
+ <nav class="navbar navbar-inverse" style="float: left;width: 100%;display: block;padding-left:0px;padding-right:0px;">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button aria-label="Menu" style="min-width:47px;" type="button" class="navbar-toggle" data-toggle="slie" data-target="#myNavbars">
+      	<cc style="text-align: center;">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        </cc>
+        <cc style="display: none;color:white;font-size: 1.1rem;padding:6px;padding-top:8px;">&#x2715</cc>
+      </button>
+
+      <div style="display:none;float:right;margin-top: 2px;" class="showmobileinline">
+
+     		<div class="showmobile hideform" style="display: none;float:right;padding-bottom:10px;padding-left: 0px;margin-right: 12px;margin-top:10px;float: right;">
+			<a href="https://www.daibau.rs/prijava/first">
+			<div><img alt="Prijava" style="height:34px;width:34px;margin-left:0px;" src="https://www.daibau.rs/images/menu/user.svg"></div>
+			</a>
+		</div>
+		
+		   		<!--mobile search-->
+		 
+		<div class="showmobile hideform hidesearch" style="display: none;float:right;padding-bottom:10px;padding-left: 0px;margin-right: 12px;float: right;" onclick="openSearch();">
+			<icon style="display: block;margin:auto;margin-top: 15px !important;-moz-transform-origin:0px -9px;" class="icon icon-zoom-2 mainmenu"></icon>
+		</div>
+		
+		</div>
+
+    <a style="display:none;" class="navbar-brand showmobile" href="https://www.daibau.rs/">
+		<div class="name" style="position:relative;">
+		<img alt="daibau.rs logo" style="width:31px;height:46px !important;display:inline-block;vertical-align:top; border: 0px;margin-top:-8px !important;margin-right:7px;" src="https://www.daibau.rs/images/daibau-logo.svg"><p style="font-weight:700;vertical-align:top;margin-top:4px;text-align:left;display:inline-block;font-size:1.4rem;font-family:'Montserrat';">daibau.rs</p>
+		</div>
+		</a>
+
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="navbar-nav">
+
+
+      
+
+		<div class="tpmenu mflex" style="text-align:right;padding:5px;padding-right:0px;width: 100%;display: flex;align-items: center;padding-top:10px;padding-bottom: 8px;">
+      	<!--upper row-->
+
+      <li class="showForm lgf" style="float:left;padding:0px;left:0px;">
+		      <div class="hidemobile">
+		         	<a style="display:flex;align-items:baseline;" href="https://www.daibau.rs/">
+					<img alt="Daibau.rs logo" style="height:23px;display:inline-block;vertical-align:top; border: 0px;margin-left:2px;padding-right:7px;" src="https://www.daibau.rs/images/daibau-logo.svg"><p style="position:relative;font-family:'Montserrat';margin:0px;font-weight:700;white-space:nowrap;vertical-align:top;text-align:left;display:inline-block;font-size:1.3rem;margin-right:8px;">daibau.rs</p>
+					</a>
+									</div>
+			</li>
+
+
+			<div class="menu-main fullstrechmobile" id="menu-main" style="-webkit-overflow-scrolling: auto !important;justify-content: center;align-items:center;width: 80%;">
+
+ 			       
+
+			<li style="display: none;float: left;font-size: 1.1rem;color:black;font-weight: 400;text-transform: none;margin-bottom:0px;padding-bottom: 0px;padding-top:10px;" class="showForm hidemobile formTitle" id="formTitle1">Najveća platforma za gradnju i renovaciju u Srbiji</li>
+
+				<li class="menucap menuhover">
+		<div class="menut" onclick="toggleMenu('.formMenu');">
+		<a style="display:flex;align-items:center;" class="maina" href="https://www.daibau.rs/objavi_projekat"><img class="mmic" style="margin-top:4px;display:inline-block;" src="https://www.daibau.rs/images/menu/project.svg" alt="Nađi majstore - icon"><span style="display: inline-block;vertical-align: middle;">Nađi majstore</span><img class="mndwn" src="https://www.daibau.rs/images/arrow-down.svg" alt="Nađi majstore - icon"/></a>
+		<div class="hoverer showmobile" style="display: none;position: absolute;right:0px;top:18px;z-index: 1000;color:silver;margin-right:10px;"><img style="margin-right: 0px;" src="https://www.daibau.rs/images/menu/next-b.svg"></div>
+		</div>
+		<div class="extendedMenu formMenu" style="text-align: center;padding:0px;margin-top:8px;">
+					<div style="position: relative;margin:auto;text-align: left;padding-bottom:0px;float:left;width:100%;background-color:white;margin-top: 14px;box-shadow:0px 5px 15px -5px gray;border-radius:8px;max-width:600px;">
+						<div class="showmobile hoverer" style="display: none;margin-left:25px;margin-top:30px;width:83%;color:black;font-size: 1.1rem;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid;" onclick="toggleMenu('.formMenu');"><img style="height:24px;margin-right:1px;margin-left:-5px;" src="https://www.daibau.rs/images/menu/back-b.svg"></div>
+						<a class="showmobile" style="display:none !important;border:none;" href="https://www.daibau.rs/objavi_projekat"><span style="color:black;font-weight: bold;float: left;width: 100%;clear: both;padding-left:30px;font-size: 1.2rem;">Nađi majstore</span></a>
+					<div class="mflexreverse" style="display:flex;width: 100%;float: left;">
+					<div class="mobilenocolumns smle">
+					<div class="scrlmn" style="width:100%;padding:16px;max-height:80vh;overflow-y:scroll;">
+					<b class="mcti">Najtraženije</b>
+										<a style="flex-basis: 100%;margin-top:12px;" href="https://www.daibau.rs/objavi_projekat">Drugo</a>
+					</div>
+					</div>
+
+					<div class="extendedMenuMainCats" style="display: inline-block;width: 50%;padding:30px;padding-left:20px;padding-right:20px;">
+					<b style="font-size:1rem;color:black;float: left;margin-bottom: 12px;width: 100%;padding-left:8px;border-left:8px solid #f2520d;">Kako radimo?</b>
+					<p style="font-size: 1rem;color:black;">
+						<ul type="1" style="font-size: 1rem;color:black;padding-left:0px;font-weight: 400;width: 100%;">
+
+							<li style="width: 100%;font-size: 1rem;color:black;display:list-item;margin-right:0px;padding-right: 0px;"><div style="background-color: #e5e5e5;border-radius: 100%;text-align: center;padding-top: 2px;height:25px;width:25px;display: inline-block;font-weight: 600;">1</div> <div style="display:inline-block;width:70%;vertical-align: top;padding-left:10px;">Pošaljete potražnju</div></li>
+							<li style="width: 100%;font-size: 1rem;color:black;display:list-item;margin-right:0px;padding-right: 0px;"><div style="background-color: #e5e5e5;border-radius: 100%;text-align: center;padding-top: 2px;height:25px;width:25px;display: inline-block;ont-weight: 600;">2</div> <div style="display:inline-block;width:70%;vertical-align: top;padding-left:10px;">Predložimo vam izvođače</div></li>
+							<li style="width: 100%;font-size: 1rem;color:black;display:list-item;margin-right:0px;padding-right: 0px;"><div style="background-color: #e5e5e5;border-radius: 100%;text-align: center;padding-top: 2px;height:25px;width:25px;display: inline-block;ont-weight: 600;">3</div> <div style="display:inline-block;width:70%;vertical-align: top;padding-left:10px;">Izaberite najboljeg</div></li>
+						</ul>
+						<a class="super-button" style="float: left;display: inline-block;width: 100%;padding:10px;text-align: center;margin-top:20px;font-weight: 500;min-width:auto !important;text-decoration: none;" href="https://www.daibau.rs/objavi_projekat">Nađi majstore</a>
+					</p>
+					</div>
+				</div>
+
+				
+				</div>
+				</div>
+		</li>
+		
+		<li class="cust-hide menucap menuhover" style="position:relative;">
+				<div class="menut" onclick="toggleMenu('.toolsMenu');">
+				<a class="maina" href="javascript:void(0);">
+					<span style="display: inline-block;vertical-align: middle;">Alati</span><img class="mndwn" src="https://www.daibau.rs/images/arrow-down.svg" alt="Nađi majstore - icon"/>
+				</a>
+				<div class="hoverer showmobile" style="display: none;position: absolute;right:0px;top:18px;z-index: 1000;color:silver;margin-right:10px;"><img style="margin-right:0px;" src="https://www.daibau.rs/images/menu/next-b.svg"></div>
+				</div>
+
+		<div id="tools_menu" class="extendedMenu toolsMenu" style="width: 300px;position: absolute;left:0px;padding-left:0px;">
+					<div class="showmobile hoverer" style="display: none;margin-left:30px;margin-top:20px;color:black;font-size: 1.1rem;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid;" onclick="toggleMenu('.toolsMenu');"><img style="height:24px;margin-right:1px;margin-left:-5px;" src="https://www.daibau.rs/images/menu/back-b.svg"></div>
+			<ul style="display:flex;flex-direction:column;background-color: white;padding: 8px;padding-left:24px;border:1px solid #e5e5e5;border-radius:10px;box-shadow: 0px 0px 20px -10px gray;">
+										<li class="cust-hide menucap ">
+						<div class="menut smenuhover" onclick="toggleMenu('#directoryMenu2');">
+						<a class="mainar"  href="https://www.daibau.rs/imenik">
+							<img class="mmic" style="margin-top:4px;display:inline-block;" alt="Izvođači icon" src="https://www.daibau.rs/images/menu/contractors.svg">
+							<span style="display: inline-block;vertical-align: middle;">Izvođači</span><!--<img class="mndwn" src="https://www.daibau.rs/images/arrow-down.svg" alt="Nađi majstore - icon"/>-->
+						</a>
+						<div onclick="toggleMenu('.dirsbmn');" class="hoverer showmobile" style="display: none;position: absolute;right:0px;top:15px;z-index: 1000;color:silver;margin-right:10px;"><img style="height:22px;margin-right:0px;margin-top:14px;" src="https://www.daibau.rs/images/menu/next-b.svg"></div>
+
+						<div class="dirsbmn sxtnddMenu extendedMenu" style="position:absolute;width:340px;padding-left:50px;top:0px;">
+								<div class="mwrpw" style="min-width:300px;width:100%;background-color:white;border-radius:15px;padding:8px;box-shadow: 0px 0px 20px -10px gray;">
+
+								<div class="showmobile hoverer" style="display: none;margin-top:20px;color:black;font-size: 1.1rem;margin-bottom:20px;" onclick="toggleMenu('.dirsbmn');"><img style="height:24px;margin-right:1px;margin-left:-5px;" src="https://www.daibau.rs/images/menu/back-b.svg"></div>
+								<div class="showmobile hoverer" style="display: none;margin-top:20px;color:black;font-size: 1.1rem;margin-bottom:20px;"><a style="font-weight: bold;border-top: 1px solid;padding-top: 20px;" href="https://www.daibau.rs/imenik">Izvođači</a></div>
+
+								<div class="scrlmn" style="width:100%;padding:16px;max-height:80vh;overflow-y:scroll;">
+																</div>
+								</div>
+						</div>
+						</div>
+					</li>
+															<li class="menucap menuhover " >
+						<div class="menut smenuhover" onclick="toggleMenu('#calculatorMenu1');">
+						<a class="mainar"  href="https://www.daibau.rs/cene">
+							<img class="mmic" style="height:21px;margin-top:4px;display:inline-block;" src="https://www.daibau.rs/images/menu/calculator.svg" alt="Prosečne cene - icon">
+							<span style="display: inline-block;vertical-align: middle;">Prosečne cene</span><!--<img class="mndwn" src="https://www.daibau.rs/images/arrow-down.svg" alt="Nađi majstore - icon"/>-->
+						</a>
+						<div onclick="toggleMenu('.calsbmn');" class="hoverer showmobile" style="display: none;position: absolute;right:0px;top:15px;z-index: 1000;color:silver;margin-right:10px;"><img style="height:22px;margin-right:0px;margin-top:14px;" src="https://www.daibau.rs/images/menu/next-b.svg"></div>
+						<div class="calsbmn sxtnddMenu extendedMenu" style="position:absolute;width:340px;padding-left:50px;top:0px;">
+								<div class="mwrpw" style="min-width:300px;width:100%;background-color:white;border-radius:15px;padding:8px;box-shadow: 0px 0px 20px -10px gray;">
+								<div class="showmobile hoverer" style="display: none;margin-top:20px;color:black;font-size: 1.1rem;margin-bottom:20px;" onclick="toggleMenu('.calsbmn');"><img style="height:24px;margin-right:1px;margin-left:-5px;" src="https://www.daibau.rs/images/menu/back-b.svg"></div>
+								<div class="showmobile hoverer" style="display: none;margin-top:20px;color:black;font-size: 1.1rem;margin-bottom:20px;"><a style="font-weight: bold;border-top: 1px solid;padding-top: 20px;" href="https://www.daibau.rs/cene">Prosečne cene</a></div>
+								<div class="scrlmn" style="width:100%;padding:16px;max-height:80vh;overflow-y:scroll;">
+																</div>
+								</div>
+						</div>
+						</div>
+					</li>
+																							</ul>
+		</div>
+		</li>
+		
+		
+				  
+			<li class="menuhover ">
+				
+				<a class="main" href="https://www.daibau.rs/magazin">
+					<img class="mmic" style="height:21px !important;display:inline-block;margin-right: 3px !important;" src="https://www.daibau.rs/images/menu/magazine.svg" alt="Daibau magazin - icon">
+					<span>Daibau magazin</span>
+				</a>
+			</li>
+			
+
+		
+				    	<li class="menucap onlypro mnright" style=""><div class="menut"><div  class="super-button" style="padding-top:6px;padding-bottom:6px;display: flex;font-size:0.95rem;position: relative;margin-bottom:2px;"><a style="display:flex;align-items:center;" class="stretched-link" href="https://www.daibau.rs/pro">Da li ste izvođač?</a></div></div>
+			</li>
+
+			
+
+						<!--end customers menu-->
+
+
+			
+
+	
+				
+
+				</div>
+
+		<!--basket container-->
+
+		<!--end of main menu-->
+
+		<div class="topmenuchoice mflex" style="font-weight: 500;font-size: 0.9rem;align-items:center;margin-left:auto;width:auto;">
+
+
+				 <!--settings-->
+		<li class="menucap menuhover" style="padding-left:12px;padding-right:12px;">
+			<div onclick="toggleMenu('.aboutMenu');">
+			<a class="maina" style="display:flex;align-items:center;white-space:nowrap;" href="https://www.daibau.rs/o_nama" style="font-size:0.9rem;">O nama</a>
+
+			<div class="hoverer showmobile" style="display: none;position: absolute;right:0px;top:15px;z-index: 1000;color:silver;margin-right:10px;"><img style="height:16px;margin-right:0px;margin-top:4px;" src="https://www.daibau.rs/images/menu/next-b.svg"></div>
+			</div>
+		</li>
+		
+		<!--flags-->
+				<li class="menut languages menucap menuhover hoverer" style="float:right;margin-top:0px;margin-right:12px;position: relative;font-size: 0.9rem;">
+
+			<div onclick="toggleMenu('.countryMenu');" style="display:flex;align-items:center;">
+			
+			 			 	<div class="" style="display:flex;align-items:center;"><img class="s-m-icon"  src="https://www.daibau.rs/images/menu/globe.svg"></div><div class="hidemobile" style="display:inline-block;">RS</div><div class="showmobileinline" style="display:none;font-size: 1.1rem;">Srbija</div>
+			  
+				</div>
+			  <div class="hoverer showmobile" style="display: none;position: absolute;right:0px;top:15px;z-index: 1000;color:silver;margin-right:0px;" onclick="toggleMenu('.countryMenu');"><img style="height:16px;margin-right: 10px;margin-top:4px;" src="https://www.daibau.rs/images/menu/next-b.svg"></div>
+		
+		<div class="countryMenu extendedMenu" style="position:absolute; margin-top:2px;max-width: 280px;">
+
+			<div style="min-height:50px;overflow:visible !important;z-index:1001;background-color: white;min-width: 250px;border:1px solid #e5e5e5;border-radius:10px;float:left;padding:20px;">
+
+			<div class="showmobile hoverer" style="display: none;margin-left:25px;margin-right:25px;margin-top:0px;color:black;border-bottom:1px solid;width:100%;padding-bottom:20px;font-size: 1.1rem;margin-bottom:20px;" onclick="toggleMenu('.countryMenu');"><img style="height:28px;margin-left:-10px;" src="https://www.daibau.rs/images/menu/back-b.svg"></div>
+			<span class="showmobile" style="display: none;color:black;font-weight: bold;float: left;width: 100%;clear: both;padding-left:30px;padding-bottom:12px;font-size: 1.2rem;">Izaberi državu</span>
+			<div class="cntr" style="float: left;width: 100%;color:#333;">
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.de"><img src="https://www.daibau.rs/images/0_comlanding/de.png"> DE: daibau.de</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.at"><img  src="https://www.daibau.rs/images/0_comlanding/at.png"> AT: daibau.at</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.ch"><img  src="https://www.daibau.rs/images/0_comlanding/ch.png"> CH: daibau.ch</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.pl"><img  src="https://www.daibau.rs/images/0_comlanding/pl.png"> PL: daibau.pl</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.cz"><img  src="https://www.daibau.rs/images/0_comlanding/cz.png"> CZ: daibau.cz</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.sk"><img  src="https://www.daibau.rs/images/0_comlanding/sk.png"> SK: daibau.sk</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.mojmojster.net"><img  src="https://www.daibau.rs/images/0_comlanding/si.png"> SI: mojmojster.net</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.emajstor.hr"><img  src="https://www.daibau.rs/images/0_comlanding/cro.png"> HR: emajstor.hr</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.rs"><img  src="https://www.daibau.rs/images/0_comlanding/rs.png"> RS: daibau.rs</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.hu"><img  src="https://www.daibau.rs/images/0_comlanding/hu.png"> HU: daibau.hu</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.ro"><img  src="https://www.daibau.rs/images/0_comlanding/ro.png"> RO: daibau.ro</a>
+			<a style="width: 100%;float: left;text-align: left;padding:5px;" href="https://www.daibau.bg"><img  src="https://www.daibau.rs/images/0_comlanding/bg.png"> BG: daibau.bg</a>
+			</div>
+		</div>
+		</div>
+		</li>
+		 
+				<li class="menucap mobilemenubottommargin loginmenu" style="float:right;padding-left: 0px;display:flex;align-items:center;padding-right:2px;">
+			<div class="super-button fullstrechmobile" style="font-size:0.95rem;background-color:#e5e5e5;color:black !important;padding-top: 6px;padding-bottom: 6px;margin-bottom:2px;min-width:auto;">
+			<a class="stretched-link" href="https://www.daibau.rs/prijava">
+			<!--<div style="margin-right:2px;"><img class="s-m-icon mmic" style="height:22px;display: inline-block !important;" src="https://www.daibau.rs/images/menu/user.svg" alt="Prijava - icon"></div>--><span class="login" style="white-space:nowrap;">Prijava</span></a>
+			</div>
+		</li>
+		
+		   
+		<div class="submenustrech paddmobile aboutMenu" style="float: left;padding-top: 10px;background-color: #e5e5e5;">
+
+			<div class="maxwidth2" style="padding-left:5px;">
+			<div class="showmobile hoverer" style="display: none;margin-left:25px;margin-top:40px;margin-right:30px;width:80%;border-bottom:1px solid;color:black;font-size: 1.1rem;margin-bottom:20px;padding-bottom:20px;" onclick="toggleMenu('.aboutMenu');"><img style="height:28px;margin-left:-10px;" src="https://www.daibau.rs/images/menu/back-b.svg"></div>
+
+			<span class="showmobile" style="display: none;color:black;font-weight: bold;float: left;width: 100%;clear: both;padding-left:30px;padding-bottom:12px;font-size: 1.2rem;">O nama</span>
+
+			<div class="articlethemes fullstrechmobile mobilemenuleft "><a href="https://www.daibau.rs/o_nama">O nama</a></div>
+			<div class="articlethemes fullstrechmobile mobilemenuleft "><a href="https://www.daibau.rs/kako-radi-daibau">Kako radimo?</a></div>
+						<div class="articlethemes fullstrechmobile mobilemenuleft "><a href="https://www.daibau.rs/dobra_dela_stvaraju_heroje">Chariti</a></div>
+									</div>
+			</div>
+
+		<div class="about-more" style="position:absolute; top:55px;min-height:50px;right:30px;display: none;overflow:visible !important;background-color: white;border-radius: 3px;padding:15px;max-width: 250px;text-align: left;color: black;overflow: hidden;z-index: 1000;">
+				<b>O sistemu</b><div class="hoverer" style="float:right;color:silver;" onclick="$(this).parent().hide();">&#x2715</div><br />
+				<div class="line" style="width:120%;margin-left: -10%;"></div>
+				 <a href="https://www.daibau.rs/o_nama"><img style="display:inline-block;" src="https://www.daibau.rs/images/menu/about.png"> O nama</a>
+				 <a href="https://www.daibau.rs/kako-radi-daibau"><img style="display:inline-block;" src="https://www.daibau.rs/images/menu/how.png"> Kako radimo</a>
+				 <a href="https://www.daibau.rs/korisnici_prednosti"><img style="display:inline-block;" src="https://www.daibau.rs/images/menu/advantages.png"> Prednosti</a>
+				 <a href="https://www.daibau.rs/korisnici_pitanja"><img style="display:inline-block;" src="https://www.daibau.rs/images/menu/faq.png"> Česta pitanja</a>
+				 <a href="https://www.daibau.rs/pro"><img style="display:inline-block;" src="https://www.daibau.rs/images/menu/companysmall.png"> Za izvođače radova</a>
+				 		</div>
+
+      </div>
+
+    </div>
+
+    <!--end of top menu-->
+
+    </div>
+		
+      </ul>
+  </div>
+</nav>
+</div>
+</div>
+
+
+<div class="toppadd"></div>
+
+<script src="https://www.daibau.rs//jsmodules/fingerprint2.min.js"></script>
+<div style="height: 100%; width: 100%;margin-top:30px;margin-bottom: 90px;float:left;font-size: 1rem;">
+<div style="width: 100%; height: 100%; text-align: center; vertical-align: middle;">
+<center style="min-height:370px;">
+<dotlottie-player src="https://www.daibau.rs/images/local/a/ani/6GbgFM9GNJ.lottie" background="transparent" speed="1" style="width: 500px; height: 370px" loop autoplay></dotlottie-player>
+</center>
+
+<span style="font-size: 1.5rem; padding: 16px 50px 16px 50px;margin-top: 16px; display: inline-block;">Strana nažalost ne postoji :(</span>
+<br><br><br>
+Ako ste očekivali stranicu majstora, obaveštavamo vas ta tog majstora više nemamo u sistemu Daibau.<br />Pozvani na <a style="color:var(--dbblue-p);" href="https://www.daibau.rs/">https://www.daibau.rs/</a>, gde možete naći pouzdanog izvođača za vaše radove.</div>
+</div>
+
+
+
+
+<div class="page-bottom" style="float:left;">
+
+<div class="popup3" id="contacts" style="padding:50px;font-size:1rem;top:50vh !important;margin-top:-15%;text-align: center;">
+	<div class="close hoverer" style="position: absolute;top: 13px;right:15px;border-radius: 100%;background-color: transparent;color:gray;font-size:1.4rem;" onclick="$('#contacts').hide();">&#x2715</div>
+	<div style="width:100%;font-size:1.4rem;font-weight:700;">Pomoć</div>
+	<p>Za vas smo dostupni svakog radnog dana od 8:00 do 16:00. Kako možemo da vam pomognemo?</p>
+	<div style="float: left;width: 100%;text-align: center;"><b>Potražnje: <a style="color:var(--dborange-p);" href="tel:+381 11 430 0 340">+381 11 430 0 340</a></b></div>
+	<div style="float: left;width: 100%;margin-top:18px;text-align:center;"><b>Preduzeća: <a style="color:var(--dborange-p);" href="tel:+381 66 510 7 644">+381 66 510 7 644</a></b></div>
+</div>
+<!--contact-->
+<div class="maxwidth2">
+<div class="MobilePadding10">
+<div class="page-container ftr" id="contact" style="text-align: left;padding-top:50px;">
+<div style="margin:auto;font-size: 1.05rem;width:100%;justify-content: stretch;" class="mflex">
+	
+	
+	<div class="fullstrechmobile" style="display:inline-block;width:25%;color:white;vertical-align:top;margin-top:25px;float: left;">
+		
+		<div class="footgr">Korisnici</div><br />
+
+			<a href="https://www.daibau.rs/objavi_projekat">Nađi majstore</a>	
+			<a href="https://www.daibau.rs/kako-radi-daibau" class="footsiebottom">Kako radimo</a>
+			<a href="https://www.daibau.rs/o_nama" class="footsiebottom">O nama</a>
+						<a href="https://www.daibau.rs/dobra_dela_stvaraju_heroje" class="footsiebottom">Chariti</a>	    </div>
+
+
+	    <div class="fullstrechmobile" style="display:inline-block;width:25%;color:white;vertical-align:top;margin-top:25px;float: left;">
+		
+		<div class="footgr">Alati</div><br />
+				
+								<a href="https://www.daibau.rs/imenik" class="footsiebottom">Izvođači</a>								<a href="https://www.daibau.rs/cene" class="footsiebottom">Prosečne cene</a>								<a href="https://www.daibau.rs/magazin" class="footsiebottom">Daibau Magazin</a>
+														</div>
+
+	    <div class="fullstrechmobile" style="display:inline-block;width:25%;color:white;vertical-align:top;margin-top:25px;float: left;">
+	    	<div class="footgr">Izvođači</div><br />
+
+	    	<a href="https://www.daibau.rs/kako_radi">Registruj preduzeće</a>
+
+	    					<a href="https://www.daibau.rs/potraznje" class="footsiebottom">Aktuelni projekti</a>
+				
+								<a href="https://www.daibau.rs/tehnicki_detajli" class="footsiebottom">Tehnički detalji</a>
+				
+	    </div>
+
+	    
+		<div class="socialtab fullstrechmobile">
+		<div onclick="$('#contacts').show();" class="hoverer" style="margin-left:auto;border:1px solid silver;border-radius:50px;padding:9px;padding-left:24px;padding-right:24px;min-width:180px;color:white;text-align:center;width: 100%;margin-bottom: 16px;">Kontakt</div>
+		<div style="display:flex;width:100%;margin-top:auto;">
+										</div>
+		</div>
+	</div>
+			<div class="int" style="float:left;width:100%;color:silver;text-align: center;border-radius: 0px;margin-bottom: 35px;margin-top:16px;font-size: 0.9rem;border-top: 1px solid gray;padding-top:16px;">
+		<div class="hoverer" onclick="$('#eu').slideToggle();" style="font-size:1.05rem;display: flex;align-items: center;margin: auto;justify-content: center;column-gap: 8px;">Ponosni partner grupe Daibau<img style="height: 10px;filter: invert(80%);" src="https://www.daibau.rs/images/arrow-down.svg"/></div>
+
+		<!--<div class="hoverer" onclick="$('#eu').slideToggle();">Europe</div>-->
+		<div id="eu" style="color:#f5f5f5;padding-top:20px;display: none;">
+			<a href="https://www.daibau.com" target="blank"><img alt="daibau.com global" src="https://www.daibau.rs/images/0_comlanding/global.png"/>Global: daibau.com</a>
+			<a href="https://www.daibau.at" target="blank"><img alt="daibau.at, Austria" src="https://www.daibau.rs/images/0_comlanding/at.png"/>AT: daibau.at</a>
+			<a href="https://www.daibau.ch" target="blank"><img alt="daibau.ch, Switzerland" src="https://www.daibau.rs/images/0_comlanding/ch.png"/>CH: daibau.ch</a>
+			<a href="https://www.daibau.de" target="blank"><img alt="daibau.de, Germany" src="https://www.daibau.rs/images/0_comlanding/de.png"/>DE: daibau.de</a>
+			<a href="https://www.daibau.pl" target="blank"><img alt="daibau.pl, Poland" src="https://www.daibau.rs/images/0_comlanding/pl.png"/>PL: daibau.pl</a>
+			<a href="https://www.daibau.cz" target="blank"><img alt="daibau.cz, Czech" src="https://www.daibau.rs/images/0_comlanding/cz.png"/>CZ: daibau.cz</a>
+			<a href="https://www.daibau.sk" target="blank"><img alt="daibau.sk, Slovakia" src="https://www.daibau.rs/images/0_comlanding/sk.png"/>SK: daibau.sk</a>
+			<a href="https://www.mojmojster.net" target="blank"><img alt="daibau.si, Slovenia" src="https://www.daibau.rs/images/0_comlanding/si.png"/>SI: mojmojster.net</a>
+			<a href="https://www.emajstor.hr" target="blank"><img alt="emajstor.hr, Croatia" src="https://www.daibau.rs/images/0_comlanding/cro.png"/>HR: emajstor.hr</a>
+			<a href="https://www.daibau.rs" target="blank"><img alt="daibau.rs, Serbia" src="https://www.daibau.rs/images/0_comlanding/rs.png"/>RS: daibau.rs</a>
+			<a href="https://www.daibau.ba" target="blank"><img alt="daibau.ba, Bosnia" src="https://www.daibau.rs/images/0_comlanding/ba.png"/>BA: daibau.ba</a>
+			<a href="https://www.daibau.hu" target="blank"><img alt="daibau.hu, Hungary" src="https://www.daibau.rs/images/0_comlanding/hu.png"/>HU: daibau.hu</a>
+			<a href="https://www.daibau.ro" target="blank"><img alt="daibau.ro, Romania" src="https://www.daibau.rs/images/0_comlanding/ro.png"/>RO: daibau.ro</a>
+			<a href="https://www.daibau.bg" target="blank"><img alt="daibau.bg, Bulgaria" src="https://www.daibau.rs/images/0_comlanding/bg.png"/>BG: daibau.bg</a>
+			<a href="https://www.daibau.mk" target="blank">MK: daibau.mk</a>
+			<a href="https://www.daibau.ng" target="blank">NG: daibau.ng</a>
+			<a href="https://www.daibau.vn" target="blank">VN: daibau.vn</a>
+		</div>
+		</div>
+		</div>
+</div>
+</div>
+</div>
+
+ 
+
+
+<div class="page-bottom" style="float:left;">
+<!--contact-->
+<div class="maxwidth2">
+
+<!--footer-->
+<div class="maxwidth2" style="padding-bottom:30px;text-align: left;color:silver;float: left;padding-top:25px;">
+<div class="MobilePadding10">
+				<a href="https://www.daibau.rs/uslovi_uporabe" class="footsiebottom">Uslovi korišćenja</a> I 
+												<a style="padding-left:8px;" href="https://www.daibau.rs/politika_privatnosti" class="footsiebottom">Politika privatnosti</a> I
+								<a style="padding-left:8px;" href="javascript:;" data-cc="c-settings" class="footsiebottom">Informacije o kolačićima</a> I
+				<a style="padding-left:8px;" href="https://www.daibau.rs/impressum" class="footsiebottom">Impressum</a>	
+<div class="ccd" style="float:right;">
+&copy; 2026 Daibau | Sva prava su zadržana</div>
+</div>
+</div>
+</div>
+</div> 
+<script>
+
+    var originalKeyword="";
+
+    function showhelper() {
+        if (document.getElementById("searchterm").value.length >= 0) {
+            document.getElementById("mainCategory").style.visibility = 'visible';
+            $('#sboard2').css('display', 'block');
+            console.log('showboard2');
+        }
+    }
+
+    function showhelper2() {
+        if (document.getElementById("postnumber").value.length > 0) {
+            document.getElementById("citySuggest").style.visibility = 'visible';
+            $('#sboard3').css('display', 'block');
+        }
+    }
+
+    if (typeof (document.getElementById('searchForm')) != 'undefined' && document.getElementById('searchForm') != null) {
+        window.addEventListener('click', function (e) {
+            if (!document.getElementById('searchForm').contains(e.target)) {
+                $('.select-items').addClass('select-hide');
+                $('#sboard2 ul').css('visibility', 'hidden');
+                $('#sboard2').css('display', 'none');
+                $('#sboard3 ul').css('visibility', 'hidden');
+            }
+        })
+    }
+
+    var intervalID = 0;
+
+    function populateDirectoryCategories() {
+        if (typeof document.getElementById("searchterm").value !== "undefined" && document.getElementById("searchterm").value != null) {
+            clearTimeout(intervalID);
+            intervalID = setTimeout(function () {
+                var input = document.getElementById("searchterm").value;
+                var helper = document.getElementById("mainCategory");
+                var wraper = document.getElementById("srchwrpr");
+                wraper.style.visibility = 'visible';
+                var navigation = document.getElementById("navigation").value;
+                if (input.length > 0) {
+                    $('#searchterm').siblings('.clearer').show();
+                    $.ajax({
+                        type: 'POST',
+                        url: "https://www.daibau.rs/suggestCategories",
+                        data: {"searchterm": input, "navigation": navigation},
+                        success: function (data) {
+                            if (typeof (data) !== "undefined" && data.length > 0 && data != 'null') {
+                                data = JSON.parse(data);
+                                var result = "";
+                                var preselectedCategory = 0;
+
+                                if (typeof data.articles !== "undefined" && data.articles != null) {
+                                    result += "<b>Magazin</b>";
+                                    $.each(data.articles, function (index, value) {
+                                        result += '<li><a href="https://www.daibau.rs/clanak/' + value.id + '/' + value.url + '">' + value.title + '</a></li>';
+                                    });
+                                }
+
+                                if (typeof data.categories !== "undefined" && data.categories != null) {
+                                    if (navigation == 'articles') result += "<hr><b>Kategorije</b>";
+                                    $.each(data.categories, function (index, value) {
+                                        //if (preselectedCategory == 0)
+                                            //preselectedCategory = value.id;
+
+                                        result += '<li onclick="populateCategory(' + value.id + ',\'' + value.category + '\');$(\'#postnumber\').focus();">' + value.category;
+                                        if (navigation == 'inquiry') result+= '';
+                                        if (navigation == 'directory') result+= '';
+                                        if (navigation == 'articles') result+= '';
+                                        if (navigation == 'calculator') result+= '';
+                                        if (navigation == 'inquiry') {
+                                            if (value.synonym != 0 && false) result += ' <font style="color:silver">(' + value.synonym + ')</font>';
+                                            if (value.synonym2 != 0 && false) result += ' <font style="color:silver">(' + value.synonym2 + ')</font>';
+                                        }
+                                        result += '</li>';
+                                    });
+
+                                    if (result == "")
+                                        result += '<li onclick="populateCategory(-1,\'Nema rezultata\');">Nema rezultata</li>';
+                                }
+                                if (typeof data.craftsmen !== "undefined" && data.craftsmen != null && data.craftsmen.length>0 && navigation != 'directorys') {
+                                    result += "<div class='line' style='width:calc(100% - 30px);margin-left:20px;'></div><b>Preduzeća</b>";
+                                    $.each(data.craftsmen, function (index, value) {
+                                        result += '<li><a href="https://www.daibau.rs/' + value.url + '">' + value.name + '</a></li>';
+                                    });
+                                }
+
+                                if (preselectedCategory > 0)
+                                    $("#selectedCategory").val(preselectedCategory);
+
+                                $('#mainCategory').empty();
+                                $('#mainCategory').append(result);
+                                helper.style.visibility = 'visible';
+                                
+                                showhelper();
+
+                            }
+                        }
+                    });
+                } else {
+                    $.ajax({
+                    type: 'POST',
+                    url: "https://www.daibau.rs/getAllCategories",
+                    data: { },
+                    success: function(data)
+                    {
+                        if(typeof(data)!=="undefined" && data.length>0 && data!='null')
+                        {   
+                            console.log('hrtr d');
+                            data = JSON.parse(data);
+                            var result="";
+
+                            if(typeof data.categories!=="undefined" && data.categories!=null)
+                            {
+                                
+                                $.each(data.categories, function( index, value )
+                                {
+                                    result+='<li onclick="populateCategory('+value.id+',\''+value.category+'\');">'+value.category;
+                                    result+='</li>';
+                                });
+                                                    
+                                if(result=="")
+                                    result+='<li onclick="populateCategory(-1,\'Nema rezultata\');">Nema rezultata</li>';
+                            }
+                        
+                            $('#mainCategory').empty();
+                            $('#mainCategory').append(result);
+                            helper.style.visibility='visible';
+
+                            showhelper();
+                        }
+                    }
+                    });
+
+                    $('#mainCategory').empty();
+                    $('#mainCategory').append('<option selected="selected" value="-1">Nema rezultata</option>');
+                    helper.style.visibility = 'hidden';
+                }
+            }, 500);
+        }
+    }
+
+    function recordSearch(searchterm,originalKeyword,navigation,categoryId,cityId,source,target) {
+        $.ajax({
+            type: 'POST',
+            url: "https://www.daibau.rs/admin/recordSearch",
+            data: {"keyword":searchterm,"originalKeyword":originalKeyword,"navigation":navigation,"categoryId": categoryId, "cityId": cityId, "source": source, "target":target},
+            success: function (data) {
+                
+            }
+        });
+    }
+
+    function filterSearch() {
+        var navigation = document.getElementById("navigation").value;
+        var categoryId = document.getElementById("selectedCategory").value;
+        var cityId = document.getElementById("cityId").value;
+        var bezirkId = document.getElementById("bezirkId").value;
+
+        var searchterm = document.getElementById("searchterm").value;
+        var source=window.location.href;
+
+        //directory
+        if (navigation == "directory") {
+            if ((cityId != -1 || bezirkId != -1) && categoryId != -1) {
+                $.ajax({
+                    type: 'POST',
+                    url: "https://www.daibau.rs/directorylink",
+                    data: {"category": categoryId, "cityId": cityId, "bezirkId": bezirkId},
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        recordSearch(searchterm,originalKeyword,navigation,categoryId,cityId,source,data);
+                        window.location.replace(data);
+                    }
+                });
+            }
+        }
+
+        //calculator or articles
+        if (navigation == "calculator" || navigation == "articles" || navigation == "prodetails") {
+            if (categoryId != -1) {
+                $.ajax({
+                    type: 'POST',
+                    url: "https://www.daibau.rs/categorylink",
+                    data: {"mainCategory": categoryId, "navigation": navigation},
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        recordSearch(searchterm,originalKeyword,navigation,categoryId,cityId,source,data);
+                        window.location.replace(data);
+                    }
+                });
+
+            } else {
+                if(navigation=='articles') {
+                    document.searchForm.action = "https://www.daibau.rs/magazin";
+                    document.getElementById("searchForm").submit();
+                } else if(navigation=='calculator') {
+                    document.searchForm.action = "https://www.daibau.rs/cene";
+                    document.getElementById("searchForm").submit();
+                }
+            }
+        }
+
+        //inquiry
+        if (navigation == "inquiry") {
+            if(searchterm.length>0) {
+                if (categoryId >= -1) {
+                    recordSearch(searchterm,originalKeyword,navigation,categoryId,cityId,source,"inquiryform");
+                    document.getElementById("searchForm").submit();
+                }
+                else
+                    recordSearch(searchterm,originalKeyword,navigation,categoryId,cityId,source,"inquiryform");
+            } else {
+                $("#searchterm").focus();
+            }
+
+        }
+
+
+        if (cityId == -1 && bezirkId == -1 && navigation == "directory") {
+            document.getElementById("postnumber").style.borderBottom = "1px solid var(--dborange-p)";
+        } else document.getElementById("postnumber").style.border = "none";
+
+        if (categoryId == -1) {
+            document.getElementById("searchterm").style.borderBottom = "1px solid var(--dborange-p)";
+            $("#searchterm").focus();
+            populateDirectoryCategories();
+        } else document.getElementById("searchterm").style.border = "none";
+    }
+
+    function populateCategory(categoryId, categoryName) {
+        if (typeof categoryId !== "undefined" && categoryId > 0) {
+            document.getElementById("selectedCategory").value = categoryId;
+            originalKeyword=document.getElementById("searchterm").value;
+            document.getElementById("searchterm").value = categoryName;
+            document.getElementById("mainCategory").style.visibility = 'hidden';
+            document.getElementById("searchterm").style.border = "none";
+            $('#sboard2').css('display', 'none');
+            filterSearch();
+
+        } else {
+            document.getElementById("searchterm").style.borderBottom = "1px solid var(--dborange-p)";
+        }
+
+    }
+
+    var intervalID2 = 0; 
+
+    function suggestCities(input,targetObject) {
+        clearTimeout(intervalID2);
+        targetObject = targetObject || 'citySuggest';
+
+        intervalID2 = setTimeout(function () {
+            var helper = document.getElementById(targetObject);
+            document.getElementById("cityId").value = -1;
+            if (typeof input !== "undefined" && input != null && input != "" && input.length > 1) {
+                $('#postnumber').siblings('.clearer').show();
+
+                $.ajax({
+                    type: 'POST',
+                    url: "https://www.daibau.rs/suggestCities",
+                    data: {"searchstring": input},
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        var result = "";
+                        var preselectedCity = 0;
+                        var preselectedBezirk = 0;
+
+                        if (data != null) {
+
+                            if (typeof data.bezirken !== "undefined" && data.bezirken != null && data.bezirken.length > 0) {
+                                document.getElementById("cityId").value = -1;
+                                var first = true;
+                                $.each(data.bezirken, function (index, value) {
+                                    if (first) {
+                                        first = !first;
+                                        result += '<b>Bezirk</b><br />';
+                                    }
+
+                                    if (preselectedBezirk == 0)
+                                        preselectedBezirk = value.id;
+
+                                    result += '<li onclick="populateBezirk(' + value.id + ',\'' + value.name + '\',\'' + targetObject + '\');">' + value.name + '</li>';
+                                });
+                            }
+
+
+                            if (typeof data.cities !== "undefined" && data.cities != null && data.cities.length > 0) {
+                                var first = true;
+                                $.each(data.cities, function (index, value) {
+                                    if (first) {
+                                        first = !first;
+                                        document.getElementById("cityId").value = value.id;
+                                        result += '<b>Kraj</b><br />';
+                                    }
+
+                                    if (preselectedBezirk == 0 && preselectedCity == 0)
+                                        preselectedCity = value.id;
+
+                                                                        result += '<li onclick="populateCity(' + value.id + ',\'' + value.city + '\',\'' + targetObject + '\');">' + value.city + '</li>';
+                                                                    });
+                            }
+
+                            if (result == "")
+                                result += '<li onclick="populateCity(-1,\'Nema rezultata\');">Nema rezultata</li>';
+
+                            if (preselectedBezirk > 0)
+                                $("#bezirkId").val(preselectedBezirk);
+                            else if (preselectedCity > 0)
+                                $("#cityId").val(preselectedCity);
+
+                            $('#'+targetObject).empty();
+                            $('#'+targetObject).append(result);
+                            helper.style.visibility = 'visible';
+
+                            if (document.getElementById('srchwrpr2'))
+                            document.getElementById('srchwrpr2').style.visibility = 'visible';
+                            
+                            showhelper2();
+
+                        }
+                    }
+                });
+            } else {
+                $('#'+targetObject)
+                    .empty()
+                    .append('<option selected="selected" value="-1">Nema rezultata</option>');
+                helper.style.visibility = 'hidden';
+            }
+        }, 500);
+    }
+
+    function populateCity(cityId, cityName, targetObject) {
+        if (typeof cityId !== "undefined" && cityId > 0) {
+            document.getElementById("cityId").value = cityId;
+            document.getElementById("bezirkId").value = -1;
+            document.getElementById("postnumber").value = cityName;
+            document.getElementById(targetObject).style.visibility = 'hidden';
+            document.getElementById("postnumber").style.border = "1px solid silver";
+            $("#postnumber2").css('border-color', 'silver');
+            $('#sboard3').css('display', 'none');
+            if(targetObject=='citySuggest') filterSearch();
+            if(targetObject=='cSuggest') document.getElementById("postnumber2").value = cityName;
+            if(targetObject=='clSuggest') $(".clInput").val(cityName);
+        } else {
+            document.getElementById(targetObject).style.visibility = 'hidden';
+            document.getElementById("postnumber").style.border = "1px solid red";
+        }
+    }
+
+    function populateBezirk(bezirkId, bezirkName, targetObject) {
+        if (typeof bezirkId !== "undefined" && bezirkId > 0) {
+            document.getElementById("cityId").value = -1;
+            document.getElementById("bezirkId").value = bezirkId;
+            document.getElementById("postnumber").value = bezirkName;
+            document.getElementById(targetObject).style.visibility = 'hidden';
+            document.getElementById("postnumber").style.border = "1px solid silver";
+            $('#sboard3').css('display', 'none');
+            if(targetObject=='citySuggest') filterSearch();
+            if(targetObject=='cSuggest') document.getElementById("postnumber2").value = bezirkName;
+        } else {
+            document.getElementById("citySuggest").style.visibility = 'hidden';
+            document.getElementById("postnumber").style.border = "1px solid red";
+        }
+    }
+
+</script>
+
+<script>
+    function requestNewPassword() {
+        var username = document.getElementById("reset-username").value;
+        var re = /\S+@\S+\.\S+/;
+        if (re.test(username) == true) {
+            $.ajax({
+                type: 'POST',
+                url: "https://www.daibau.rs/registracija/forgotpassword",
+                data: {"username": username},
+                success: function () {
+                    alert("Link za promenu lozinke vam je bila posredovana na email adresu.");
+                }
+            });
+        } else
+            alert("Za dobijanje nove lozinke pod korisničko ime upišite svoju registrovanu E-mail adresu. Za pomoć kontaktirajte nas na tel. +381 11 430 0 340.");
+    }
+</script>
+
+
+<script>
+
+    $(document).ready(function () {
+        //menu
+        $(document).on('click', '.navbar-toggle', function(event) {
+            $('cc').toggle();
+            //$('.collapse').slideToggle('fast');
+            toggleMenu('.collapse');
+        });
+        
+        //refresh search on option change
+        if (document.getElementById("searchterm") !== null && document.getElementById("postnumber") !== null) {
+            // Get the input field
+            var inputSearch = document.getElementById("searchterm");
+            
+            $(document).on('click', '.select-items > div', function(event) {
+                if(inputSearch.value.length>0)
+                    populateDirectoryCategories();
+            });
+        }
+
+//IE9 placeholders fix
+        function placeholderIsSupported() {
+            var test = document.createElement('input');
+            return ('placeholder' in test);
+        }
+
+        if (!placeholderIsSupported()) {
+            $('[placeholder]').focus(function () {
+                var input = $(this);
+                if (input.val() == input.attr('placeholder')) {
+                    input.val('');
+                    input.removeClass('placeholder');
+                }
+            }).blur(function () {
+                var input = $(this);
+                if (input.val() == '' || input.val() == input.attr('placeholder')) {
+                    input.addClass('placeholder');
+                    input.val(input.attr('placeholder'));
+                }
+            }).blur();
+        }
+//IE9 placeholders fix end
+
+        /*
+        $(document).on('mouseover', '.search-hover', function(event) {
+
+            if($('.search-pad').is(':visible'))
+            {
+            }
+            else
+            {
+                $('#search-pad').css( "display","block");
+                $('.search-pad').css('position', 'fixed');
+                $('.search-pad').effect( "bounce", { direction:'up', times: 5, distance: 40 }, 700);
+
+                //$('.search-pad').children().slideDown('fast');
+            }
+        });
+        */
+        /*
+	*/
+
+        getBasketProductList();
+
+        /*hiding search bar*/
+
+        /*
+*/
+    });
+
+
+</script>
+
+
+<script>
+    var x, i, j, selElmnt, a, b, c;
+    /* Look for any elements with the class "custom-select": */
+    x = document.getElementsByClassName("custom-select");
+    for (i = 0; i < x.length; i++) {
+        selElmnt = x[i].getElementsByTagName("select")[0];
+        /* For each element, create a new DIV that will act as the selected item: */
+        a = document.createElement("DIV");
+        a.setAttribute("class", "select-selected");
+        //a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+        //console.log(selElmnt.options[selElmnt.selectedIndex].value);
+        
+            if(selElmnt.options[selElmnt.selectedIndex].value=='inquiry')
+                            a.innerHTML = '<img style="display:inline-block;margin-right: 6px;" src="https://www.daibau.rs/images/menu/project.svg">';
+            if(selElmnt.options[selElmnt.selectedIndex].value=='calculator')
+                            a.innerHTML = '<img style="margin-top:2px;display:inline-block;margin-right: 6px;" src="https://www.daibau.rs/images/menu/calculator.svg">';
+            if(selElmnt.options[selElmnt.selectedIndex].value=='articles')
+                            a.innerHTML = '<img style="display:inline-block;margin-right: 6px;" src="https://www.daibau.rs/images/menu/magazine.svg">';
+        
+        x[i].appendChild(a);
+        /* For each element, create a new DIV that will contain the option list: */
+        b = document.createElement("DIV");
+        b.setAttribute("class", "select-items select-hide");
+        for (j = 1; j < selElmnt.length; j++) {
+            /* For each option in the original select element,
+            create a new DIV that will act as an option item: */
+            c = document.createElement("DIV");
+            c.innerHTML = selElmnt.options[j].innerHTML;
+            c.setAttribute('optval',selElmnt.options[j].value);
+            if(selElmnt.options[j].value=='inquiry')
+                            c.innerHTML = '<img src="https://www.daibau.rs/images/menu/project.svg">'+selElmnt.options[j].innerHTML;
+            if(selElmnt.options[j].value=='calculator')
+                            c.innerHTML = '<img src="https://www.daibau.rs/images/menu/calculator.svg">'+selElmnt.options[j].innerHTML;
+            if(selElmnt.options[j].value=='articles')
+                            c.innerHTML = '<img src="https://www.daibau.rs/images/menu/magazine.svg">'+selElmnt.options[j].innerHTML;
+            c.addEventListener("click", function (e) {
+                /* When an item is clicked, update the original select box,
+                and the selected item: */
+                var y, i, k, s, h;
+                s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+                h = this.parentNode.previousSibling;
+                for (i = 0; i < s.length; i++) {
+                    if (s.options[i].value == this.getAttribute('optval')) {
+                        s.selectedIndex = i;
+                        console.log(s.value);
+                        if(s.value=='inquiry') {
+                            h.innerHTML = '<img src="https://www.daibau.rs/images/menu/project.svg">';
+                            //document.getElementById('search-button2').innerHTML = 'Potraži izvođače';
+                            document.getElementById('searchterm').placeholder = 'Koju vrstu usluge tražite?';
+                        }
+                        else if(s.value=='calculator') {
+                            h.innerHTML = '<img src="https://www.daibau.rs/images/menu/calculator.svg">';
+                            //document.getElementById('search-button2').innerHTML = 'Prosečne cene';
+                            document.getElementById('searchterm').placeholder = 'Koju vrstu usluge tražite?';
+                        }
+                        else if(s.value=='articles') {
+                            h.innerHTML = '<img src="https://www.daibau.rs/images/menu/magazine.svg">';
+                            //document.getElementById('search-button2').innerHTML = 'Savet';
+                            document.getElementById('searchterm').placeholder = 'Šta tražite?';
+                        }
+                        else {
+                        h.innerHTML = this.innerHTML;
+                        }
+                        y = this.parentNode.getElementsByClassName("same-as-selected");
+                        for (k = 0; k < y.length; k++) {
+                            y[k].removeAttribute("class");
+                        }
+                        this.setAttribute("class", "same-as-selected");
+                        break;
+                    }
+                }
+                h.click();
+            });
+            b.appendChild(c);
+        }
+        x[i].appendChild(b);
+        a.addEventListener("click", function (e) {
+            /* When the select box is clicked, close any other select boxes,
+            and open/close the current select box: */
+            e.stopPropagation();
+            closeAllSelect(this);
+            this.nextSibling.classList.toggle("select-hide");
+            this.classList.toggle("select-arrow-active");
+        });
+    }
+
+    function closeAllSelect(elmnt) {
+        /* A function that will close all select boxes in the document,
+        except the current select box: */
+        var x, y, i, arrNo = [];
+        x = document.getElementsByClassName("select-items");
+        y = document.getElementsByClassName("select-selected");
+        for (i = 0; i < y.length; i++) {
+            if (elmnt == y[i]) {
+                arrNo.push(i)
+            } else {
+                $(y[i]).removeClass("select-arrow-active");
+            }
+        }
+        for (i = 0; i < x.length; i++) {
+            if (arrNo.indexOf(i)) {
+                $(x[i]).addClass("select-hide");
+            }
+        }
+    }
+
+    /* If the user clicks anywhere outside the select box,
+    then close all select boxes: */
+    document.addEventListener("click", function (e) { 
+        if(!event.target.className.includes('mnu') && !event.target.className.includes('dlto'))
+        { 
+            $('.dropmenuopen').slideToggle();
+            $('.dropmenuopen').removeClass('dropmenuopen');
+        }
+    });
+
+
+    function count() {
+        $('.count222').each(function () {
+            let originalNum = parseInt($(this).text().replace(/\s/g, ''), 10);
+            let lastTwoDigits = originalNum % 100;
+            let staticPart = Math.floor(originalNum / 100) * 100;
+
+            $(this).prop('Counter', staticPart).animate({
+                Counter: originalNum
+            }, {
+                duration: 3500,
+                easing: 'swing',
+                step: function (now) {
+                    let rounded = Math.ceil(now);
+                    let staticPartCurrent = Math.floor(rounded / 100) * 100;
+                    let animatedPart = rounded % 100;
+
+                    // Format number with space as thousands separator
+                    let formattedNumber = (staticPartCurrent + animatedPart).toLocaleString('de-DE').replace(/\./g, ' ');
+
+                    $(this).text(formattedNumber);
+                }
+            });
+        });
+    }
+
+
+
+    if (document.getElementById("searchterm") !== null && document.getElementById("postnumber") !== null) {
+        // Get the input field
+        var inputSearch = document.getElementById("searchterm");
+        var inputPost = document.getElementById("postnumber");
+// Execute a function when the user releases a key on the keyboard
+        inputSearch.addEventListener("keyup", function (event) {
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+
+                var navigation = document.getElementById("navigation").value;
+                // Cancel the default action, if needed
+                event.preventDefault();
+                // Trigger the button element with a click
+                //filterSearch();
+                console.log(inputSearch.value);
+                if(navigation=='inquiry')
+                    document.getElementById("searchForm").submit();
+                else if(navigation=='articles') {
+                    document.searchForm.action = "https://www.daibau.rs/magazin";
+                    document.getElementById("searchForm").submit();
+                } else if(navigation=='calculator') {
+                    document.searchForm.action = "https://www.daibau.rs/cene";
+                    document.getElementById("searchForm").submit();
+                }
+                else
+                    filterSearch();
+            }
+        });
+
+        inputPost.addEventListener("keyup", function (event) {
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+                // Cancel the default action, if needed
+
+                // Trigger the button element with a click
+                filterSearch();
+            }
+        });
+    }
+
+</script>
+
+
+<script>
+    function clearBasket() {
+        if (confirm("Da li ste sigurni da želite da ispraznite korpu?")) {
+            $.ajax({
+                url: "https://www.daibau.rs/popis/clearBasket",
+                type: "POST",
+                success: function (data) {
+                    if ($("#storeProductsContainer").length) {
+                        $("#storeProductsContainer").css("display", "none");
+                        $("#storeProductsContainer").html();
+                        getBasketProductList();
+                    }
+                }
+            });
+        }
+    }
+
+    function removeProductFromBasket(productId, varianceId, shapeId) {
+        if (typeof productId != "undefined" && productId != null && productId > 0 && confirm("Želite da odstranite označenu stavku iz korpe?") == true) {
+            $.ajax({
+                url: "https://www.daibau.rs/popis/removeProductFromBasket",
+                type: "POST",
+                data: {"productId": productId, "variance": varianceId, "shape": shapeId},
+                success: function (data) {
+                    try {
+                        data = JSON.parse(data);
+                        if (data.success)
+                            getBasketProductList();
+                    } catch (JSONError) {
+                    }
+                }
+            });
+        }
+    }
+
+    function addProductToBasket(productId, quantity, varianceId, shapeId) {
+        if (typeof productId != "undefined" && productId != null && productId > 0) {
+            $.ajax({
+                url: "https://www.daibau.rs/popis/addProductInBasket",
+                type: "POST",
+                data: {"productId": productId, "quantity": quantity, "variance": varianceId, "shape": shapeId},
+                success: function (data) {
+                    try {
+                        data = JSON.parse(data);
+                        if (data.success) {
+                            getBasketProductList();
+                            $("#spcright").css("display", "block");
+                        }
+                    } catch (JSONError) {
+                    }
+                }
+            });
+        }
+    }
+
+    function updateProductQuantity(productId, quantity, varianceId, shapeId) {
+        if (typeof productId != "undefined" && productId != null && productId > 0
+            && typeof quantity != "undefined" && quantity != null && quantity > 0
+            && typeof varianceId != "undefined" && varianceId != null
+            && typeof shapeId != "undefined" && shapeId != null) {
+            $.ajax({
+                url: "https://www.daibau.rs/popis/updateProductQuantity",
+                type: "POST",
+                data: {"productId": productId, "quantity": quantity, "variance": varianceId, "shape": shapeId},
+                success: function (data) {
+                    try {
+                        data = JSON.parse(data);
+                    } catch (JSONError) {
+                    }
+                }
+            });
+        }
+    }
+
+    function getBasketProductList() {
+        if ($("#storeProductsContainer").length) {
+            //$("#storeProductsContainer").css("display","none");//
+            $("#storeProductsContainer").html("Korpa je prazna");
+
+            $.ajax({
+                url: "https://www.daibau.rs/popis/getBasketProductList/true",
+                type: "POST",
+                success: function (data) {
+                    try {
+                        data = JSON.parse(data);
+                        if (data.success) {
+                            if (typeof data.viewData != "undefined" && data.viewData != null && data.viewData.length > 0) {
+                                $("#storeProductsContainer").html(data.viewData);
+                                //$("#storeProductsContainer").css("display","block");
+
+                                $("#basketNumber").html(data.numproducts);
+
+
+                                setTimeout(function(){
+                                    $('.fullProductList').animate({ scrollTop: $('.fullProductList').prop("scrollHeight")}, 600, "swing");
+                                }, 400);
+                            }
+                        } else
+                            $("#basketNumber").html('0');
+                    } catch (JSONError) {
+                    }
+                }
+            });
+        }
+    }
+
+    // Object to store timeout IDs for each "num"
+    const debounceTimers = {};
+
+    //calculator basket
+    function addCItem(itemId, quantity) {
+
+        // Clear any existing timeout for this "num"
+        if (debounceTimers[itemId]) {
+            clearTimeout(debounceTimers[itemId]);
+        }
+
+        // Set a new timeout for 3 seconds
+        debounceTimers[itemId] = setTimeout(() => {
+            if (typeof itemId != "undefined" && itemId != null && itemId > 0) {
+                $.ajax({
+                    url: "https://www.daibau.rs/popis/addCItemToList",
+                    type: "POST",
+                    data: {"itemId": itemId, "quantity": quantity},
+                    success: function (data) {
+                        try {
+                            data = JSON.parse(data);
+                            if (data.success) {
+                                getCItemsList();
+                                //$("#spcright").css("display", "block");
+                            }
+                        } catch (JSONError) {
+                        }
+                    }
+                });
+            }
+        }, 3000);
+    }
+
+    function updateCItemQuantity(itemId, quantity) {
+        if (typeof itemId != "undefined" && itemId != null && itemId > 0
+            && typeof quantity != "undefined" && quantity != null && quantity > 0
+            ) {
+            $.ajax({
+                url: "https://www.daibau.rs/popis/updateCItemQuantity",
+                type: "POST",
+                data: {"itemId": itemId, "quantity": quantity},
+                success: function (data) {
+                    try {
+                        data = JSON.parse(data);
+                    } catch (JSONError) {
+                    }
+                }
+            });
+        }
+    }
+
+    function getCItemsList() {
+        console.log('Loading items...');
+        if ($("#CItemsContainer").length) {
+            //$("#storeProductsContainer").css("display","none");//
+            $("#CItemsContainer").html("Korpa je prazna");
+
+            $.ajax({
+                url: "https://www.daibau.rs/popis/getCItemsList/true",
+                type: "POST",
+                success: function (data) {
+                    try {
+                        data = JSON.parse(data);
+                        if (data.success) {
+                            if (typeof data.viewData != "undefined" && data.viewData != null && data.viewData.length > 0) {
+                                $("#CItemsContainer").html(data.viewData);
+                                //$("#storeProductsContainer").css("display","block");
+
+                                //$("#basketNumber").html(data.numproducts);
+
+                                /*
+                                setTimeout(function(){
+                                    $('.fullProductList').animate({ scrollTop: $('.fullProductList').prop("scrollHeight")}, 600, "swing");
+                                }, 400);
+                                */
+                            }
+                        } else {
+                            //$("#basketNumber").html('0');
+                        }
+                    } catch (JSONError) {
+                    }
+                }
+            });
+        }
+    }
+
+    function SignIn(email, newreg) {
+        if (newreg == undefined || newreg == null)
+            newreg = true;
+
+        if (typeof email == "undefined" || email == null)
+            email = "";
+        
+        $.ajax({
+            type: 'POST',
+            url: 'https://www.daibau.rs/prijava/loadLoginForm',
+            data: {"email": email, "newreg": newreg},
+            dataType: "json",
+            success: function (data) {
+                $("#login-drop").html(data);
+                
+                $("#login-drop").css('display', 'block');
+                $("#start-craftsman").css('display', 'block');
+                $(".warningpopup").css('display', 'none');
+            }
+        });
+
+    }
+
+    function HidePopup() {
+        //$(".popup3").html("");
+        $(".popup3").css('display', 'none');
+        $("#start-craftsman").css('display', 'none');
+        $("#start-craftsman-dark").css('display', 'none');
+    }
+
+    function performLogin() {
+        var data = new FormData();
+        data.append("username", $("#craftsman-login-form input[name='username']").val());
+        data.append("password", $("#craftsman-login-form input[name='password']").val());
+
+        getBrowserFingerprint(function (fingerprint) {
+            if (fingerprint)
+                data.append("fingerprint", fingerprint);
+
+            $.ajax({
+                type: 'POST',
+                url: 'https://www.daibau.rs/prijava/performMenuLogin',
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    try {
+                        data = JSON.parse(data);
+                        if (data) {
+                            if ($(".duplicateInquiry").length)
+                                checkDuplicates();
+                            else {
+                                $('#craftsman-menu-in').prop('onclick', null).off('click');
+                                location.reload();
+                            }
+
+                            HidePopup();
+                        } else
+                            document.getElementById("loginError").style.display = "block";
+                    } catch (JSONError) {
+                        document.getElementById("loginError").style.display = "block";
+                    }
+                }
+            });
+        });
+    }
+
+    function performLogout() {
+        var data = new FormData();
+        getBrowserFingerprint(function (fingerprint) {
+            data.append("applicationRedirect", false);
+            if (fingerprint)
+                data.append("fingerprint", fingerprint);
+
+            $.ajax({
+                type: 'POST',
+                url: 'https://www.daibau.rs/prijava/logout',
+                data: data,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    window.location = 'https://www.daibau.rs/';
+                }
+            });
+        });
+    }
+
+</script>
+
+<script type="text/javascript">
+
+    function adoptInquiry(inquiryId, craftsmanHash) {
+        if (typeof (inquiryId) !== "undefined" && inquiryId != null && inquiryId > 0 && typeof craftsmanHash !== "undefined" && craftsmanHash != null) {
+            $.ajax({
+                type: 'POST',
+                url: "https://www.daibau.rs/narudzba/adopt/" + inquiryId,
+                data: {
+                    "chash": craftsmanHash
+                },
+                success: function (data) {
+                    if (typeof data !== "undefined" && data != null && data.length > 0) {
+                        try {
+                            data = JSON.parse(data);
+                            if (typeof data !== "undefined" && data != null) {
+                                if (data.success)
+                                    window.location = data.url;
+                                else if (typeof data.view !== "undefined" && data.view != null) {
+                                    var response_window = document.createElement("div");
+                                    response_window.innerHTML = data.view;
+                                    document.body.appendChild(response_window);
+                                }
+                            } else {
+                                /*empty response*/
+                            }
+                        } catch (jsonError) {
+                            /*invalid json*/
+                        }
+                    } else {
+                        /*handle error*/
+                    }
+                }
+            });
+        }
+    }
+
+    function updateContents(boxDivId, url) {
+        updateContentsWithData(boxDivId, url, "");
+    }
+
+    function updateContentsWithData(boxDivId, url, data) {
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: data,
+            success: function (gotData) {
+                $("#" + boxDivId).html(gotData);
+            }
+
+        });
+    }
+
+    function loadPopup(popupId) {
+        //loads popup only if it is disabled
+        $("#Popup" + popupId).fadeIn("medium");
+        centerPopup(popupId);
+    }
+
+    function disablePopup(popupId) {
+        $("#Popup" + popupId).fadeOut("medium");
+    }
+
+    function centerPopup(popupId) {
+        $("#Popup" + popupId).css({
+            "position": "fixed"
+        });
+        var winw = $(window).width();
+        var scroll = $(window).scrollTop();
+        var winh = $(window).height();
+        var popw = $('#Popup' + popupId).width();
+        var poph = $('#Popup' + popupId).height();
+        $("#Popup" + popupId).css({
+            "position": "fixed",
+            "top": "40%",
+            "margin-top": -poph / 2,
+        });
+    }
+
+    function imposeMaxLength(Event, Object, MaxLen) {
+        return (Object.value.length <= MaxLen) || (Event.keyCode == 8 || Event.keyCode == 46 || (Event.keyCode >= 35 && Event.keyCode <= 40))
+    }
+
+    function submitInquiry(id) {
+        document.getElementById('product-form' + id).submit();
+    }
+
+    function validateSelectedFile(sender) {
+        var validExts = [".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG"];
+        var fileExt = sender.value;
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if (validExts.indexOf(fileExt) < 0) {
+            alert("Nedozvoljen tip datoteke. Ubacite sliku tipa JPG ili PNG.");
+            sender.type = "";
+            sender.type = "file";
+            return false;
+        } else if (sender.files[0].size / 1024 / 1024 > 3.0) {
+            alert("Prevelika datoteka! Najveća dozvoljena veličina je 3MB.");
+            sender.type = "";
+            sender.type = "file";
+            return false;
+        } else return true;
+    }
+
+    function populateProductsAndSubProductsFromCategory(storeCategoryId, craftsmanId) {
+        if (typeof storeCategoryId !== "undefined" && storeCategoryId != null && storeCategoryId > 0 && typeof craftsmanId !== "undefined" && craftsmanId != null) {
+            $.ajax({
+                type: 'POST',
+                url: "https://www.daibau.rs/references/populateProductsAndSubProductsFromCategory",
+                data: {
+                    "categoryId": storeCategoryId,
+                    "craftsmanId": craftsmanId
+                },
+                success: function (data) {
+                    document.getElementById("productList").innerHTML = data;
+                    var bLazy = new Blazy({
+                        selector: '.lld', success: function (ele) {
+                            $('.lld').addClass('lld-loaded');
+                        }
+                    });
+                }
+            });
+
+            document.getElementById("addProductLink").setAttribute("onClick", "showProductEditForm(-1," + storeCategoryId + ',' + craftsmanId + ");$(this).hide();");
+        }
+    }
+
+
+    function formatNumbers(element) {
+        var onlynumber = element.value;
+        onlynumbermod = onlynumber.replace(/[^0-9]/g, '');
+        element.value = onlynumbermod;
+    }
+
+    function formatPostNumbers(element) {
+        var onlynumber = element.value;
+        onlynumbermod = onlynumber.replace(/[^0-9 -]/g, '');
+        element.value = onlynumbermod;
+    }
+
+    function formatLetters(element) {
+        var onlynumber = element.value;
+        onlynumber = onlynumber.replace(/[^a-zA-Z\u00C0-\u024F\u1E00-\u1EFFАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯЁЂЃЄЅІЇЈЉЊЋЌЎЏҐабвгдежзийклмнопрстуфхцчшщъыьэюяёђѓєѕіїјљњћќўџґ\s]/i, "");
+        element.value = onlynumber;
+    }
+
+    function formatLettersAndNumbers(element) {
+        var onlynumber = element.value;
+        onlynumber = onlynumber.replace(/[^a-zA-Z\u00C0-\u024F\u1E00-\u1EFFАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯЁЂЃЄЅІЇЈЉЊЋЌЎЏҐабвгдежзийклмнопрстуфхцчшщъыьэюяёђѓєѕіїјљњћќўџґ0-9\s]/i, "");
+        element.value = onlynumber;
+    }
+
+    function formatGaps(element) {
+        var text = element.value;
+        text = text.replace(/\s/g, '');
+        element.value = text;
+    }
+
+    function formatDecimalNumbers(element) {
+        var price = element.value;
+        price = price.replace(/,/g, '.');
+        price = price.replace(/[.](?=.*[.])/g, "");
+        price = price.replace(/[^0-9.]+/g, "");
+
+        if (price.indexOf('.') - price.length < -3)
+            price = parseFloat(price).toFixed(2);
+        if (price <= 0 || price == "")
+            price = '0.00';
+        element.value = price;
+    }
+
+    function clearZeroField(element) {
+        var price = element.value;
+        if (parseInt(price) == 0)
+            element.value = '';
+    }
+
+
+    function verifyPhoneNumber(hash, userId, successCallback, errorCallback) {
+        $('.phoneVerificationError').hide();
+
+        var queryParams = "";
+        if (hash && hash != "") {
+            queryParams = 'hash=' + hash;
+        }
+
+        if (userId && userId != "") {
+            queryParams = 'userId=' + userId;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "https://www.daibau.rs/registracija/verifyPhoneNumber?" + queryParams,
+            data: $("form#verifyPhoneNumberForm").serialize(),
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(data);
+                } else {
+                    $('.verify-phone').hide();
+                    $('.custphone-phone-verified').css('display', 'inline-block');
+                    $('#verificationSuccess').show();
+                    $('#verificationSuccess .phone-verification-message').show();
+                }
+            },
+            error: function (request, status, error) {
+                if (errorCallback) {
+                    errorCallback(request);
+                } else {
+                    $('.phoneVerificationError').show();
+                }
+            }
+        });
+    }
+
+    function resendPhoneVerificationCode(hash, userId, successCallback, errorCallback) {
+        $('.phoneVerificationError').hide();
+
+        var queryParams = "";
+
+        if (hash && hash != "") {
+            queryParams = 'hash=' + hash;
+        }
+
+        if (userId && userId != "") {
+            queryParams = 'userId=' + userId;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "https://www.daibau.rs/registracija/resendPhoneVerificationCode?" + queryParams,
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(data);
+                }
+            },
+            error: function (request, status, error) {
+                if (errorCallback) {
+                    errorCallback(request);
+                } else if (request.responseText) {
+                    var jsonResult = JSON.parse(request.responseText);
+                    if (jsonResult && jsonResult.code === 102) {
+                        $('.verify-phone').hide();
+                        $('.phoneVerificationLimitReached').show();
+                    } else {
+                        $('.verify-phone').hide();
+                        $('.phoneVerificationError').show();
+                    }
+                }
+            }
+        });
+    }
+
+    const COOLDOWN_DURATION_MS = 300000; // 5 minutes in milliseconds
+    const STORAGE_KEY = 'lastResendAttemptTime';
+
+    function tryResendPhoneVerificationCode(hash) {
+
+        if (hash && hash != "") {
+            hash = hash;
+        }
+        else hash="";
+
+        const lastAttemptTime = localStorage.getItem(STORAGE_KEY);
+        const currentTime = new Date().getTime();
+
+        // 1. Check if a cooldown is active
+        if (lastAttemptTime) {
+            const timeElapsed = currentTime - parseInt(lastAttemptTime, 10);
+            
+            if (timeElapsed < COOLDOWN_DURATION_MS) {
+                const timeRemainingMS = COOLDOWN_DURATION_MS - timeElapsed;
+                const minutes = Math.floor(timeRemainingMS / 60000);
+                const seconds = Math.ceil((timeRemainingMS % 60000) / 1000);
+                
+                // Format the remaining time for the alert
+                let timeMessage = '';
+                if (minutes > 0) {
+                    timeMessage += `${minutes}m`;
+                }
+                if (seconds > 0) {
+                    if (minutes > 0) timeMessage += ' i ';
+                    timeMessage += `${seconds}s`;
+                }
+
+                message = 'Ponekad primanje SMS koda može potrajati nekoliko minuta. Molimo sačekajte {{timeMessage}}, pre nego što zatražite novi kod.';
+                message = message.replace('{{timeMessage}}',timeMessage);
+
+                // Alert the user to wait
+                alert(message);
+                
+                // Block the execution of the function
+                return false;
+            }
+        }
+
+        // 2. If no cooldown is active, proceed with the resend action
+        
+        // Store the current time as the new last attempt time
+        localStorage.setItem(STORAGE_KEY, currentTime.toString());
+        
+        resendPhoneVerificationCode(hash); 
+        alert('SMS kod poslat.');
+        
+        return false;
+    }
+
+    function formatDate(time) {
+        var formattedDate = new Date(time * 1000);
+        var d = formattedDate.getDate();
+        var m = formattedDate.getMonth();
+        m += 1;
+        var y = formattedDate.getFullYear();
+
+        var h = formattedDate.getHours();
+        var min = formattedDate.getMinutes();
+        var s = formattedDate.getSeconds();
+
+        if (d < 10) {
+            d = "0" + d;
+        }
+
+        if (m < 10) {
+            m = "0" + m;
+        }
+
+        if (y < 10) {
+            y = "0" + y;
+        }
+
+        if (h < 10) {
+            h = "0" + h;
+        }
+
+        if (min < 10) {
+            min = "0" + min;
+        }
+
+        if (s < 10) {
+            s = "0" + s;
+        }
+
+        return d + "." + m + "." + y; //+ " " + h + ":" + min + ":" + s;
+    }
+
+    function formatDateTime(time) {
+        if (!time || time === "undefined")
+            return "";
+
+        var formattedDate = new Date(time * 1000);
+        var d = formattedDate.getDate();
+        var m = formattedDate.getMonth();
+        m += 1;
+        var y = formattedDate.getFullYear();
+
+        var h = formattedDate.getHours();
+        var min = formattedDate.getMinutes();
+        var s = formattedDate.getSeconds();
+
+        if (d < 10) {
+            d = "0" + d;
+        }
+
+        if (m < 10) {
+            m = "0" + m;
+        }
+
+        if (y < 10) {
+            y = "0" + y;
+        }
+
+        if (h < 10) {
+            h = "0" + h;
+        }
+
+        if (min < 10) {
+            min = "0" + min;
+        }
+
+        if (s < 10) {
+            s = "0" + s;
+        }
+
+        return d + "." + m + "." + y + " " + h + ":" + min + ":" + s;
+    }
+
+    function downloadProdetailFile(prodetailId, fileId) {
+        $.ajax({
+            type: 'POST',
+            url: "https://www.daibau.rs/category/incrementProdetailFileDownload",
+            data: {"prodetailId": prodetailId},
+            async: false,
+            success: function (data) {
+                // do nothing, we just inform API about download, if it fails we should prevent file download.
+            }
+        });
+
+        window.location = 'https://www.daibau.rs//showfile.php?uuid=' + fileId;
+    }
+
+    function loadProdetailFiles(prodetailId, fileType = 'cad') {
+        $.ajax({
+            type: 'GET',
+            url: "https://www.daibau.rs/craftsman/getProdetailFiles/" + prodetailId,
+            data: {
+                "fileType": 'file-'+fileType
+            },
+            success: function (data) {
+                var prodetailFilesHtml = '<ul class="'+fileType+'-details-list" style="padding-left: 0px;display:none;">';
+
+                if (data) {
+                    data = JSON.parse(data);
+                    dataLength = data.length;
+                    if (dataLength > 0) {
+                        if (dataLength > 1) {
+                            prodetailFilesHtml = '<a id="attachmentquestion" class="blue-'+fileType+'-button blue-button fullstrechmobile" style="float:left;border:1px solid var(--dbblue-p);clear: both;display: block;width: 100% !important;border-radius: 60px;text-align: left;text-transform: uppercase;font-size: 14px !important;padding: 5px 20px;margin-bottom:10px;" href="#" onclick="$(\'.'+fileType+'-details-list\').show();return false;">#{prodetail_file_translation}<span style="margin-top:4px;height:25px;width:25px;float:right;"><svg xmlns="http://www.w3.org/2000/svg"   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span></a>' + prodetailFilesHtml;
+
+                            data.forEach(file => {
+                                prodetailFilesHtml += '<li style="text-align: left;padding: 5px;">' +
+                                    '<a href="#" onclick="downloadProdetailFile('+prodetailId+',\'' + file.file_uuid + '\'); return false;"><span class="attachmentImage"></span>' + file.filename + '</a>' +
+                                    '</li>';
+                            })
+                            prodetailFilesHtml += "</ul>";
+                        } else {
+                            prodetailFilesHtml = '<a id="attachmentquestion" class="blue-'+fileType+'-button blue-button fullstrechmobile" style="float:left;border:1px solid var(--dbblue-p);clear: both;display: block;width: 100% !important;border-radius: 60px;text-align: left;text-transform: uppercase;font-size: 14px !important;padding: 5px 20px;" href="#" onclick="downloadProdetailFile('+prodetailId+',\'' + data[0].file_uuid + '\'); return false;">#{prodetail_file_translation}<span style="margin-top:4px;height:25px;width:25px;float:right;"><svg xmlns="http://www.w3.org/2000/svg"   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span></a>';
+                        }
+
+                        if (fileType == 'cad') {
+                            prodetailFilesHtml = prodetailFilesHtml.replace('#{prodetail_file_translation}', 'Preuzmi CAD detalj');
+                        } else if (fileType == 'docs') {
+                            prodetailFilesHtml = prodetailFilesHtml.replace('#{prodetail_file_translation}', 'Preuzmi tehničku dokumentaciju');
+                        }
+
+                        $('.prodetail-' + prodetailId + ' .'+fileType+'-details').show();
+                        $('.prodetail-' + prodetailId + ' .'+fileType+'-details').append(prodetailFilesHtml);
+                    }
+                }
+            }
+        });
+    }
+
+    function subscribeNews(hash,type) {
+        if (typeof hash !== "undefined" && hash != null && hash.length > 0) {
+            $.ajax({
+                type: 'POST',
+                url: "https://www.daibau.rs/news/subscriptions",
+                data: {"hash": hash, "type": type},
+                async: false,
+                success: function (data) {
+                    if (typeof data !== "undefined" && data != null && data) {
+                        //data = JSON.parse(data);
+                        if (typeof data !== "undefined" && data != null && data) {
+                            if (data.success) {
+                                if(data.action=='subscribed') {
+                                    var result = "Hvala Vam za prijavu i dobrodošli među čitaoce <b>magazina Daibau.rs</b>.";
+                                } else if(data.action=='unsubscribed') {
+                                    result = '<b>Odjavljeni</b> ste od primanja magazina Daibau.rs. Želite li da se ponovo prijavite? <a href="javascript:void(0);" onclick="subscribeNews(\'' + hash + '\',\'' + type + '\');" style="color:var(--dborange-p);">Prijava</a>';
+                                } else if(data.action=='verifyemail') {
+                                    result = 'Hvala Vam za prijavu i dobrodošli među čitaoce <b>magazina Daibau.rs</b>. Da biste završili prijavu, molimo vas da kliknete na link u imejlu koji smo vam poslali.';
+                                } else
+                                    result = 'Greška, ne postoji pretplata ili nemate pravo na uređivanje.';
+                            } else {
+                                result = 'Greška, ne postoji pretplata ili nemate pravo na uređivanje.';
+                            }
+                        } else {
+                            result = 'Greška, ne postoji pretplata ili nemate pravo na uređivanje.';
+                        }
+                        document.getElementById("newsletterContent").innerHTML = result;
+                    }
+                },
+                error: function () {
+                    result = 'Greška, ne postoji pretplata ili nemate pravo na uređivanje.';
+                    document.getElementById("newsletterContent").innerHTML = result;
+                }
+            });
+        }
+    }
+
+    function getBrowserFingerprint(callback) {
+        try {
+            return Fingerprint2.get({}, function (components) {
+                var values = components.map(function (component) {
+                    return component.value
+                });
+                callback(Fingerprint2.x64hash128(values.join(''), 31));
+            })
+        } catch (err) {
+            // Nothing to do here, we cannot get browser fingerprint.
+            callback(false);
+        }
+    }
+
+</script>
+
+
+<div class="popup3" id="login-drop"></div>
+
+<div id="start-craftsman" onclick="HidePopup();return false;"></div>
+<div id="start-craftsman-dark" onclick="HidePopup();return false;"></div><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c45d7c4c8606689',t:'MTc2OTQ5MTY2Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
